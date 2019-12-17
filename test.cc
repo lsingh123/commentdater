@@ -4,4 +4,5 @@
 int main() {
   // initial program
   printf("hello world\n");
+  int x;
 }
