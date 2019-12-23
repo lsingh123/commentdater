@@ -26,7 +26,7 @@ with open("README.md", "rb") as f:
  
  
 setup(
-    name = "cmdline-commentdater",
+    name = "commentdater",
     packages = ["commentdater"],
     entry_points = {
         "console_scripts": ['commentdater = commentdater.src:main']
@@ -35,5 +35,7 @@ setup(
     description = "Python command line tool to check for out of date comments.",
     long_description = long_descr,
     author = "Lavanya Singh",
-    author_email = "lsingh@college.harvard.edu"
+    author_email = "lsingh@college.harvard.edu",
+    url = "https://github.com/lsingh123/commentdater",
+    download_url="https://github.com/lsingh123/commentdater/archive/v0.1.0.tar.gz"
     )
