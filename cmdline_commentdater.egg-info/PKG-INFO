@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: cmdline-commentdater
+Version: 0.1.0
+Summary: Python command line tool to check for out of date comments.
+Home-page: UNKNOWN
+Author: Lavanya Singh
+Author-email: lsingh@college.harvard.edu
+License: UNKNOWN
+Description: nothing yet
+        
+Platform: UNKNOWN

@@ -1,0 +1,3 @@
+[console_scripts]
+commentdater = commentdater.src:main
+
