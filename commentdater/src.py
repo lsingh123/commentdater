@@ -11,17 +11,36 @@ __version__ = "0.1.0"
 import os
 import sys
 import argparse
+from lang import Lang
 
 class CommentDater:
     
     DIFF_FILE = "diffs.txt"
+    LANG = None
 
+    # file: input file
+    # output_len: lenght of the output
     def __init__(self, file, output_len = 50):
         self.file = file
         self.diffs = []
         self.comments = []
         self.find_lines()
         self.output_len = output_len
+        self.set_lang()
+    
+    # determine language of the input file
+    # raise ValueError if incorrect file format
+    def set_lang(self, file):
+        if file.find(".py") != -1:
+            self.LANG = Lang(Lang['python'])
+        elif file.find(".cc") != -1:
+            self.LANG = Lang(Lang['c'])
+        elif file.find(".java") != -1:
+            self.LANG = Lang(Lang['java'])
+        else:
+            raise ValueError('''file must end in one of the following extensions:
+                .cc, .py, .java''' )
+            
 
     # run git diff in a child process to get diffs
     # put the diffs in diffs.txt
@@ -46,14 +65,6 @@ class CommentDater:
         # wait for child to finish
         r = os.waitpid(pid, 0)
         
-    ## parse a diff line to get line number
-    def parse_line(self, line):
-        line = line[line.find("+")+1:]
-        end = line.find(",") 
-        if end == -1:
-            end = line.find(" @")
-        return line[:end]
-        
     # return list of changed lines in diff_file
     def find_lines(self, diff_file=None):
         self.get_diffs()
@@ -67,41 +78,74 @@ class CommentDater:
         lines = list(map(lambda s: int(s), lines))
         self.diffs = lines
         return lines
+        
+    # parse a diff line to get line number
+    def parse_line(self, line):
+        line = line[line.find("+")+1:]
+        end = line.find(",") 
+        if end == -1:
+            end = line.find(" @")
+        return line[:end]
     
     # return True if line contains a comment
-    # TODO: incorporate non-C languages
-    def is_comment(self, line):
-        return line.find("//") != -1 and line.count('"', 0, line.find("//")) % 2 == 0
+    # char is the comment delimiter
+    def is_comment(self, line, char):
+        return line.find(char) != -1 and line.count('"', 0, line.find(char)) % 2 == 0            
     
-    # returns a list of line numbers of affected comments 
-    # a comment is affected if a line of code after it but before the next comment
-    # has been modified
-    # TODO: handle multiline comments
+    ''' returns a list of line numbers of affected comments 
+           a comment is affected if a line of code after it but before the next 
+           comment has been modified
+    '''
     # TODO: make comment finder algorithm more fine grained
     def find_comments(self):
         with open(self.file, "r") as fd:
-            seen = set()
+            
+            
             # a list of tuples in the form (comment_line, comment, diff_line, diff)
             comments = []
             lineno = 1
             last_comment = None
+            multiline = False 
+            
+            # iterate over the lines in the file
             lines = list(iter(fd.readline, ''))
             for line in lines:
-                if self.is_comment(line):
+                
+                # found the start of a multiline comment 
+                if self.is_comment(line, self.LANG.get_multiline_start()):
+                    multiline = True
                     last_comment = lineno
-                if (lineno in self.diffs and last_comment and lineno != last_comment 
-                    and last_comment not in seen and last_comment not in self.diffs):
-                    seen.add(last_comment)
+                
+                # ignore contents of a multiline comment
+                elif multiline:
+                    pass
+                
+                # found end of a multiline comment
+                elif self.is_comment(line, self.LANG.get_multiline_end()):
+                    multiline = False 
+                
+                # found a singleline comment
+                elif self.is_comment(line, self.LANG.get_single()):
+                    last_comment = lineno
+                
+                # found a diff with an unedited comment
+                elif (lineno in self.diffs and last_comment and 
+                      last_comment not in self.diffs):
                     comments.append((last_comment,lines[last_comment-1], lineno, line))
+                    last_comment = None
+                    
                 lineno += 1
-        #print("comments: ", comments)
         self.comments = list(comments)
-        return list(comments)
     
     # print output string
     def build_output(self):
+        
+        if len(self.comments) == 0:
+            return 
+        
         string = "\n"
         output_len = self.output_len
+
         for comment in self.comments:
             string += ("possible outdated comment at " + self.file + ":" + str(comment[0]) + ':\n\t "')
             string += comment[1][0:output_len].replace("\n", "").strip()
@@ -114,6 +158,7 @@ class CommentDater:
             string += '"\n\n'
         print(string, end="")
     
+    # parse a file
     def parse(self):
         self.find_comments()
         self.build_output()
