@@ -20,23 +20,24 @@ class CommentDater:
 
     # file: input file
     # output_len: lenght of the output
-    def __init__(self, file, output_len = 50):
+    def __init__(self, file, output_len = 50, output = sys.stdout):
         self.file = file
         self.diffs = []
         self.comments = []
         self.find_lines()
         self.output_len = output_len
-        self.set_lang()
+        self.set_lang(file)
+        self.output = output
     
     # determine language of the input file
     # raise ValueError if incorrect file format
     def set_lang(self, file):
         if file.find(".py") != -1:
-            self.LANG = Lang(Lang['python'])
+            self.LANG = Lang.python
         elif file.find(".cc") != -1:
-            self.LANG = Lang(Lang['c'])
+            self.LANG = Lang.c
         elif file.find(".java") != -1:
-            self.LANG = Lang(Lang['java'])
+            self.LANG = Lang.java
         else:
             raise ValueError('''file must end in one of the following extensions:
                 .cc, .py, .java''' )
@@ -142,7 +143,7 @@ class CommentDater:
         
         if len(self.comments) == 0:
             return 
-        
+                
         string = "\n"
         output_len = self.output_len
 
@@ -156,7 +157,7 @@ class CommentDater:
             if (len(comment[3]) > output_len):
                 string += "..."
             string += '"\n\n'
-        print(string, end="")
+        print(string, end="", file=self.output)
     
     # parse a file
     def parse(self):
