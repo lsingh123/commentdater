@@ -16,6 +16,12 @@ Usage
     optional arguments:
       -h, --help            show this help message and exit
       -f FILE, --file FILE  file to check
+      
+Tests
+-----------------------
+Modify the infiles in commentdater/test_data/ as indicated in the code 
+    cd commentdater
+    python3 test.py
 
 Author
 -----------------------
