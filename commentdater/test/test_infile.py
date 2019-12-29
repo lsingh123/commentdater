@@ -10,7 +10,7 @@ Created on Wed Dec 25 12:24:05 2019
 def main():
     
     # initial program code
-    print("hello world")
+    print("hello world ")
     
     '''a multiline comment 
     to see if we can handle that functionality 

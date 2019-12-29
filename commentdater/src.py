@@ -67,6 +67,7 @@ class CommentDater:
         r = os.waitpid(pid, 0)
         
     # return list of changed lines in diff_file
+    # handle the case of subsequent lines that have been edited
     def find_lines(self, diff_file=None):
         self.get_diffs()
         if not diff_file:
@@ -99,6 +100,7 @@ class CommentDater:
     '''
     # TODO: make comment finder algorithm more fine grained
     def find_comments(self):
+        print(self.diffs)
         with open(self.file, "r") as fd:
             
             
@@ -163,7 +165,7 @@ class CommentDater:
     def parse(self):
         self.find_comments()
         self.build_output()
-        os.remove(self.DIFF_FILE)
+        #os.remove(self.DIFF_FILE)
 
 # handle arguments
 def create_parser():

@@ -1,0 +1,6 @@
+
+possible outdated comment at test/test_infile.py:9:
+	 "# a test file in python"
+for diff at test/test_infile.py:11:
+	 "print("added a line here")"
+
