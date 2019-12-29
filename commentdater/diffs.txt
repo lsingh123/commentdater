@@ -1,13 +1,13 @@
 diff --git a/commentdater/test/test_infile.py b/commentdater/test/test_infile.py
-index 18f1e47..f611d06 100644
+index 18f1e47..acde27a 100644
 --- a/commentdater/test/test_infile.py
 +++ b/commentdater/test/test_infile.py
 @@ -10,0 +11 @@ def main():
-+    print("added a line here")
++    print("added this line")
 @@ -12,2 +13,2 @@ def main():
 -    # initial program code
 -    print("hello world")
 +    # initial program code - modified
-+    print("hello world - modified")
++    print("hello world modified")
 @@ -17,0 +19 @@ def main():
-+    print("added a line here")
++    print("added this line")

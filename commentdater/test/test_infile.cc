@@ -1,11 +1,11 @@
-// this is some sample c code to test out commentdater
+// this is some sample code to test commentdater - add a line after 2 for test
 #include <cstdio>
 
 int main() {
-  // initial program
-  printf("hello world\n");
+  // initial program - modify for test
+  printf("hello world! - modify for test\n")
 
   /* a multiline comment
-    to make sure we can handle these
+    to make sure we can handle these - add a line after 10 for test
     */
 }

@@ -77,17 +77,20 @@ class CommentDater:
         lines = list(filter(lambda s: s.find("@@") != -1, lines))
         for i in range(len(lines)):
            lines[i] = self.parse_line(lines[i])
-        lines = list(map(lambda s: int(s), lines))
-        self.diffs = lines
-        return lines
         
     # parse a diff line to get line number
+    # adds relevant line numbers to self.diffs
     def parse_line(self, line):
         line = line[line.find("+")+1:]
         end = line.find(",") 
+        count = int(line[end+1])
         if end == -1:
             end = line.find(" @")
-        return line[:end]
+            count = 1
+        for i in range(0, count):
+            self.diffs.append(int(line[:end]) + i)
+                
+        
     
     # return True if line contains a comment
     # char is the comment delimiter
@@ -100,9 +103,7 @@ class CommentDater:
     '''
     # TODO: make comment finder algorithm more fine grained
     def find_comments(self):
-        print(self.diffs)
         with open(self.file, "r") as fd:
-            
             
             # a list of tuples in the form (comment_line, comment, diff_line, diff)
             comments = []
@@ -113,23 +114,25 @@ class CommentDater:
             # iterate over the lines in the file
             lines = list(iter(fd.readline, ''))
             for line in lines:
+
                 
                 # found the start of a multiline comment 
-                if self.is_comment(line, self.LANG.get_multiline_start()):
+                if self.is_comment(line, self.LANG.get_multiline_start()) and not multiline:
                     multiline = True
                     last_comment = lineno
-                
-                # ignore contents of a multiline comment
-                elif multiline:
-                    pass
                 
                 # found end of a multiline comment
                 elif self.is_comment(line, self.LANG.get_multiline_end()):
                     multiline = False 
+    
+                # ignore contents of a multiline comment
+                elif multiline:
+                    pass
                 
                 # found a singleline comment
                 elif self.is_comment(line, self.LANG.get_single()):
                     last_comment = lineno
+                
                 
                 # found a diff with an unedited comment
                 elif (lineno in self.diffs and last_comment and 
@@ -150,11 +153,11 @@ class CommentDater:
         output_len = self.output_len
 
         for comment in self.comments:
-            string += ("possible outdated comment at " + self.file + ":" + str(comment[0]) + ':\n\t "')
+            string += ("possible outdated comment at " + self.file + ":" + str(comment[0]) + '\n\t "')
             string += comment[1][0:output_len].replace("\n", "").strip()
             if (len(comment[1]) > output_len):
                 string += "..."
-            string += ('"\nfor diff at ' + self.file + ":" + str(comment[2]) + ':\n\t "')
+            string += ('"\nfor diff at ' + self.file + ":" + str(comment[2]) + '\n\t "')
             string += comment[3][0:output_len].replace("\n", "").strip()
             if (len(comment[3]) > output_len):
                 string += "..."
