@@ -16,10 +16,10 @@ importlib.reload(src)
 class Tester(unittest.TestCase):
         
     def test_py(self):
-        with open("test/test_output.txt", "w") as fd:
-            dater = src.CommentDater("test/test_infile.py", output = fd)
+        with open("test_data/test_output.txt", "w") as fd:
+            dater = src.CommentDater("test_data/test_infile.py", output = fd)
             dater.parse()
-        with open("test/test_output.txt", "r") as fd:
+        with open("test_data/test_output.txt", "r") as fd:
             output = "".join(list(fd.readlines()))
         
         # check outdated single line comment (file modified line 11)
@@ -33,10 +33,10 @@ class Tester(unittest.TestCase):
         self.assertNotEqual(output.find("possible outdated comment at test/test_infile.py:16"), -1)
     
     def test_c(self):
-        with open("test/test_output.txt", "w") as fd:
-            dater = src.CommentDater("test/test_infile.cc", output = fd)
+        with open("test_data/test_output.txt", "w") as fd:
+            dater = src.CommentDater("test_data/test_infile.cc", output = fd)
             dater.parse()
-        with open("test/test_output.txt", "r") as fd:
+        with open("test_data/test_output.txt", "r") as fd:
             output = "".join(list(fd.readlines()))
         
         # check outdated single line comment (file modified line 3)
@@ -51,4 +51,4 @@ class Tester(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
-    os.remove("test/test_output.txt")
+    os.remove("test_data/test_output.txt")
