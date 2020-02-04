@@ -16,12 +16,17 @@ Usage
     optional arguments:
       -h, --help            show this help message and exit
       -f FILE, --file FILE  file to check
+
+Dependencies 
+-----------------------
+commentdater uses git. to install git command line tools, https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
       
 Tests
 -----------------------
 Modify the infiles in commentdater/test_data/ as indicated in the code 
     cd commentdater
     python3 test.py
+   
 
 Author
 -----------------------
