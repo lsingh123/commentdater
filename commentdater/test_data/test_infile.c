@@ -1,5 +1,5 @@
 // this is some sample code to test commentdater - add a line after 2 for test
-#include <cstdio>
+#include <stdio.h>
 
 int main() {
   // initial program - modify for test

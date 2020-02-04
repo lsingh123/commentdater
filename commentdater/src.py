@@ -41,7 +41,7 @@ class CommentDater:
         else:
             raise ValueError('''file must end in one of the following extensions:
                 .cc, .py, .java''' )
-            
+        self.LANG.set_filename(file)
 
     # run git diff in a child process to get diffs
     # put the diffs in diffs.txt
@@ -90,13 +90,13 @@ class CommentDater:
         for i in range(0, count):
             self.diffs.append(int(line[:end]) + i)
                 
-        
     
     # return True if line contains a comment
     # char is the comment delimiter
     def is_comment(self, line, char):
         return line.find(char) != -1 and line.count('"', 0, line.find(char)) % 2 == 0            
     
+
     ''' returns a list of line numbers of affected comments 
            a comment is affected if a line of code after it but before the next 
            comment has been modified
@@ -107,37 +107,46 @@ class CommentDater:
             
             # a list of tuples in the form (comment_line, comment, diff_line, diff)
             comments = []
-            lineno = 1
-            last_comment = None
-            multiline = False 
+            
+            # a tuple of the form (comment, function_no)
+            last_comment = None    
+            
+            # the index of the function we are currently in
+            function_no = 0
             
             # iterate over the lines in the file
             lines = list(iter(fd.readline, ''))
-            for line in lines:
-
+            lineno = 0
+            
+            while (lineno < len(lines)):
                 
-                # found the start of a multiline comment 
-                if self.is_comment(line, self.LANG.get_multiline_start()) and not multiline:
-                    multiline = True
-                    last_comment = lineno
+                line = lines[lineno]
                 
-                # found end of a multiline comment
-                elif self.is_comment(line, self.LANG.get_multiline_end()):
-                    multiline = False 
-    
-                # ignore contents of a multiline comment
-                elif multiline:
-                    pass
+                # found a multiline comment
+                if self.is_comment(line, self.LANG.get_multiline_start()):
+                    last_comment = (lineno+1, function_no)
+                    
+                    # look for the end of the comment
+                    while(not self.is_comment(line, self.LANG.get_multiline_end())):
+                        lineno[1] += 1
+                    
+                    # if comment directly precedes function definition, count it 
+                    # as a part of the following function
+                    if self.LANG.is_function(lines[lineno]):
+                        last_comment[1] += 1
+                
+                # found the start of a function
+                elif self.LANG.is_function(line):
+                    function_no += 1
                 
                 # found a singleline comment
                 elif self.is_comment(line, self.LANG.get_single()):
-                    last_comment = lineno
-                
+                    last_comment = (lineno+1, function_no)
                 
                 # found a diff with an unedited comment
-                elif (lineno in self.diffs and last_comment and 
-                      last_comment not in self.diffs):
-                    comments.append((last_comment,lines[last_comment-1], lineno, line))
+                elif (lineno+1 in self.diffs and last_comment and 
+                      last_comment[0] not in self.diffs and function_no == last_comment[1]):
+                    comments.append((last_comment[0],lines[last_comment[0]-1], lineno+1, line))
                     last_comment = None
                     
                 lineno += 1
@@ -168,7 +177,7 @@ class CommentDater:
     def parse(self):
         self.find_comments()
         self.build_output()
-        #os.remove(self.DIFF_FILE)
+        os.remove(self.DIFF_FILE)
 
 # handle arguments
 def create_parser():
