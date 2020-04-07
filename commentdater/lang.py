@@ -53,11 +53,11 @@ class Lang(Enum):
     
     def is_function(self, line):
         if self is Lang.python:
-            self.python_is_function(self, line)
+            self.python_is_function(line)
         if self is Lang.c:
-            self.c_is_function(self, line)
+            self.c_is_function(line)
         if self is Lang.java:
-            self.java_is_function(self, line)
+            self.java_is_function(line)
     
     def set_filename(self, file):
         self.filename = file

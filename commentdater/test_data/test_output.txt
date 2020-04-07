@@ -1,0 +1,11 @@
+
+possible outdated comment at test_data/test_infile.py:9
+	 "# a test file in python - add a line after line 10..."
+for diff at test_data/test_infile.py:11
+	 "int x = 0"
+
+possible outdated comment at test_data/test_infile.py:18
+	 "'''"
+for diff at test_data/test_infile.py:19
+	 "int y = 0"
+

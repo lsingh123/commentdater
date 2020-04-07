@@ -35,7 +35,7 @@ class CommentDater:
     def set_lang(self, file):
         if file.find(".py") != -1:
             self.LANG = Lang.python
-        elif file.find(".cc") != -1:
+        elif file.find(".cc") != -1 or file.find(".c") != -1:
             self.LANG = Lang.c
         elif file.find(".java") != -1:
             self.LANG = Lang.java
@@ -47,7 +47,6 @@ class CommentDater:
     # run git diff in a child process to get diffs
     # put the diffs in diffs.txt
     def get_diffs(self):
-        print("getting diffs")
         pid = os.fork()
         
         # set up the child process
@@ -77,7 +76,6 @@ class CommentDater:
         self.get_diffs()
         if not diff_file:
             diff_file = self.DIFF_FILE
-        print(diff_file)
         with open(diff_file, "r") as fd:
             lines = list(iter(fd.readline, ''))
         lines = list(filter(lambda s: s.find("@@") != -1, lines))
@@ -198,7 +196,6 @@ def create_parser():
 def main():
     argp = create_parser()
     args = argp.parse_args()  
-    print("test1")
     dater = CommentDater(args.file, args.commit)
     dater.parse()
         
