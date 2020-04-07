@@ -24,8 +24,8 @@ commentdater uses git. to install git command line tools, https://git-scm.com/bo
 Tests
 -----------------------
 Modify the infiles in commentdater/test_data/ as indicated in the code 
-    cd commentdater
-    python3 test.py
+    
+    python test.py
    
 
 Author
