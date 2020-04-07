@@ -19,11 +19,12 @@ class CommentDater:
     LANG = None
 
     # file: input file
-    # output_len: lenght of the output
-    def __init__(self, file, output_len = 50, output = sys.stdout):
+    # output_len: length of the output
+    def __init__(self, file, commit, output_len = 50, output = sys.stdout):
         self.file = file
         self.diffs = []
         self.comments = []
+        self.commit = commit
         self.find_lines()
         self.output_len = output_len
         self.set_lang(file)
@@ -46,12 +47,16 @@ class CommentDater:
     # run git diff in a child process to get diffs
     # put the diffs in diffs.txt
     def get_diffs(self):
+        print("getting diffs")
         pid = os.fork()
         
         # set up the child process
         if (pid == 0):
-            args = ["git", "diff", "HEAD~1", "-U0", self.file]
-            
+            if (self.commit == ''):
+              args = ["git", "diff", "HEAD~1", "-U0", self.file]            
+            else:
+              args = ["git", "diff", self.commit, "-U0", self.file]
+
             # set up outfile
             outfile = open(self.DIFF_FILE, "w+")
             os.dup2(outfile.fileno(), sys.stdout.fileno())
@@ -72,6 +77,7 @@ class CommentDater:
         self.get_diffs()
         if not diff_file:
             diff_file = self.DIFF_FILE
+        print(diff_file)
         with open(diff_file, "r") as fd:
             lines = list(iter(fd.readline, ''))
         lines = list(filter(lambda s: s.find("@@") != -1, lines))
@@ -184,6 +190,7 @@ def create_parser():
     argp = argparse.ArgumentParser(
             description='Check if your comments are out of date')
     argp.add_argument('-f', '--file', type=str, help='file to check', required=True)
+    argp.add_argument('-c', '--commit', type=str, help='commit to compare to', default='')
     return argp
 
 
@@ -191,8 +198,10 @@ def create_parser():
 def main():
     argp = create_parser()
     args = argp.parse_args()  
-    dater = CommentDater(args.file)
+    print("test1")
+    dater = CommentDater(args.file, args.commit)
     dater.parse()
         
-            
+if __name__ == '__main__':
+  main()            
     
